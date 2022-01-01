@@ -8,7 +8,7 @@ import {
   signOut
 } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import initAuth from '../firebase/firebase.init';
 
 initAuth();
@@ -22,16 +22,10 @@ const useFirebase = () => {
   const auth = getAuth();
 
   const navigate = useNavigate();
-  const location = useLocation();
-  const signupPrevLocation = location?.state?.from || '/';
-  const loginPrevLocation = location?.state?.from || '/dashboard';
-
-  console.log('authdata', userData);
-  console.log('dbuserdata', dbUserData);
 
   const fetchDbUser = (email) => {
     setIsLoading(true);
-    const url = `http://localhost:5000/getUser`;
+    const url = `https://hero-rider-im-rudra.herokuapp.com/getUser`;
     fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -46,13 +40,20 @@ const useFirebase = () => {
       });
   };
 
+  useEffect(() => {
+    if (!userData.email) return;
+    fetchDbUser(userData.email);
+  }, [userData.email]);
+
+  console.log(dbUserData);
+
   const addUserToDb = (userInfo) => {
     const formDoc = new FormData();
     for (const property in userInfo) {
       formDoc.append(property, userInfo[property]);
     }
     const { email } = userInfo;
-    const url = 'http://localhost:5000/addUser';
+    const url = 'https://hero-rider-im-rudra.herokuapp.com/addUser';
     fetch(url, {
       method: 'POST',
       body: formDoc
@@ -62,7 +63,6 @@ const useFirebase = () => {
         if (data.acknowledged) {
           fetchDbUser(email);
         }
-        console.log(data);
       })
       .catch((err) => console.log(err.message));
   };
@@ -97,7 +97,7 @@ const useFirebase = () => {
       .then(({ user }) => {
         setUserData(user);
         setError('');
-        if (user.email) navigate(loginPrevLocation);
+        if (user.email) navigate('/dashboard');
       })
       .catch((err) => {
         setError(err.message);
@@ -124,7 +124,6 @@ const useFirebase = () => {
         setUserData(user);
         fetchDbUser(user.email);
         setIsLoading(false);
-        console.log(dbUserData);
       } else {
         setUserData({});
         setIsLoading(false);

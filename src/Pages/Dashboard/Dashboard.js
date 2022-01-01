@@ -1,16 +1,13 @@
 import { Box, List, ListItem, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
-import React, { useState } from 'react';
+import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import AllUsers from './AllUsers/AllUsers';
+import Courses from './Courses/Courses';
 
-const menuItems = [
-  { title: 'All users', path: '' },
-  { title: 'Payment', path: '/payment' },
-  { title: 'Review', path: '/review' }
-];
+const menuItems = [{ title: 'Courses', path: '/' }];
 const adminMenuItem = [
   {
     title: 'All Users',
@@ -46,7 +43,6 @@ const useStyle = makeStyles(() => ({
 
 const Dashboard = () => {
   const { dbUserData, logout } = useAuth();
-  const [admin, setAdmin] = useState(true);
   const classes = useStyle();
   const navigate = useNavigate();
   // const { path, url } = useRouteMatch();
@@ -70,7 +66,7 @@ const Dashboard = () => {
               <ListItemText primary={item.title} />
             </ListItem>
           ))}
-          {admin &&
+          {dbUserData?.isAdmin &&
             adminMenuItem.map((item) => (
               <ListItem
                 className={location.pathname.includes(`${item.path}`) ? classes.active : null}
@@ -89,6 +85,7 @@ const Dashboard = () => {
       </Paper>
       <Box sx={{ width: '100%' }}>
         <Routes>
+          <Route path="" element={<Courses />} />
           <Route path="all-users" element={<AllUsers />} />
         </Routes>
       </Box>

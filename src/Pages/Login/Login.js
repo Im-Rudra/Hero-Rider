@@ -1,7 +1,9 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
+  const { passwordLogin } = useAuth();
   const [formData, setFormData] = useState({});
   const formHandler = (e) => {
     const { name, value } = e.target;
@@ -10,8 +12,9 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // if (!formData.email || !formData.password) return;
+    if (!formData.email || !formData.password) return;
     console.log(formData);
+    passwordLogin(formData.email, formData.password);
     setFormData({});
     e.target.reset();
   };
